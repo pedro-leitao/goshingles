@@ -49,9 +49,17 @@ func TestComplexIncorporate(t *testing.T) {
 	shingles.Initialize(TRIGRAM)
 	shingles.Incorporate(loremIpsum, true)
 	got := shingles.Count()
-	expected := 35
+	expected := 17
 	if got != expected {
 		t.Errorf("TestComplexIncorporate: got %v, expected %v", got, expected)
 	}
 	shingles.SortedWalk()
+}
+
+func BenchmarkComplexIncorporate(b *testing.B) {
+	var shingles Shingles
+	for i := 0; i <= b.N; i++ {
+		shingles.Initialize(TRIGRAM)
+		shingles.Incorporate(loremIpsum, true)
+	}
 }
