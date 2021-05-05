@@ -155,3 +155,13 @@ func (sh *Shingles) SortedWalk() {
 		fmt.Printf("hash:%v, ngram:'%v', count:%v, frequency:%v\n", hash, sh.ngrams[hash].ngram, sh.ngrams[hash].occurrences, frequency(sh.ngrams[hash].occurrences, sh.Count()))
 	}
 }
+
+// SortedList returns a list of all n-grams, sorted by decreasing frequency
+func (sh *Shingles) SortedList() []string {
+	var ngrams []string
+	sort.Sort(sort.Reverse(sh))
+	for _, hash := range sh.hashes {
+		ngrams = append(ngrams, sh.ngrams[hash].ngram)
+	}
+	return ngrams
+}
