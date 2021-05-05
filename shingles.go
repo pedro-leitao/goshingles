@@ -20,6 +20,19 @@ const (
 	EIGHTGRAM
 )
 
+var stopwords = []string{"i", "me", "my", "myself", "we", "our", "ours", "ourselves",
+	"you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she",
+	"her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs",
+	"themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am",
+	"is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do",
+	"does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as",
+	"until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into",
+	"through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in",
+	"out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there",
+	"when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other",
+	"some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s",
+	"t", "can", "will", "just", "don", "should", "now"}
+
 // NGram is a single n-gram, including it's frequency in the corpora
 type NGram struct {
 	ngram       string
@@ -32,6 +45,15 @@ type Shingles struct {
 	n      int
 	ngrams map[uint32]*NGram
 	hashes []uint32
+}
+
+func contains(slice []string, val string) bool {
+	for _, item := range slice {
+		if item == val {
+			return true
+		}
+	}
+	return false
 }
 
 func hash(s string) uint32 {
@@ -51,12 +73,15 @@ func sentences(s string) (sentences []string) {
 	return
 }
 
-// Extract all words from a given input
+// Extract all words from a given input, removing any english stopwords if normalizing
 func words(s string, normalize bool) (words []string) {
 	re := regexp.MustCompile(`(?m)\b([\w'-]{1,})\b`) // A word extractor... works surprisingly well, but only for latin characters.
 	for _, match := range re.FindAllString(s, -1) {
 		switch {
 		case normalize:
+			if contains(stopwords, strings.ToLower(match)) {
+				continue
+			}
 			words = append(words, strings.ToLower(match))
 		default:
 			words = append(words, match)
